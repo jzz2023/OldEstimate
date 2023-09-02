@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>社会参与评估</title>
+    <link rel="stylesheet" href="Layui/layui/css/layui.css">
+    <script src="Layui/layui/layui.js"></script>
+    <style>
+        h2 {
+            font-family: 华文楷体;
+            font-size: 25px;
+            font-weight: bold;
+            margin-left: 43%;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        #rate {
+            margin-left: 60px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+<h2>老年人社会参与评估</h2>
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">生活能力</label>
+        <div class="layui-input-block">
+            <select id="life">
+                <option value="3"></option>
+                <option value="0">除个人生活自理外，能料理家务或当家管理事务</option>
+                <option value="1">除个人生活自理外，能做家务，但欠好，家庭事务安排欠条理</option>
+                <option value="2">个人生活能自理；只有在他人帮助下才能做些家务，但质量不好</option>
+                <option value="3">个人基本生活事务能自理，在督促下可洗漱</option>
+                <option value="4">个人基本生活事务需要部分帮助或完全依赖他人帮助</option>
+            </select>
+        </div>
+    </div>
+    <div id="others">
+        <div class="layui-form-item">
+            <label class="layui-form-label">工作能力</label>
+            <div class="layui-input-block">
+                <select id="work">
+                    <option value="4"></option>
+                    <option value="0">原来熟练的脑力工作或体力技巧性工作可照常进行</option>
+                    <option value="1">原来熟练的脑力工作或体力技巧性工作能力有所下降</option>
+                    <option value="2">原来熟练的脑力工作或体力技巧性工作明显不如以往，部分遗忘</option>
+                    <option value="3">对熟练工作只有一些片段保留，技能全部遗忘</option>
+                    <option value="4">对以往的知识或技能全部磨灭</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">时间/空间定向</label>
+            <div class="layui-input-block">
+                <select id="space_time">
+                    <option value="4"></option>
+                    <option value="0">时间观念清楚；可单独出远门，能很快掌握新环境的方位</option>
+                    <option value="1">时间观念有些下降,清楚，但有时相差几天；可单独来往于近街，知道现住地的名称和方位，但不知回家路线</option>
+                    <option value="2">时间观念较差，年、月、日不清楚，可知上半年或下半年；只能单独在家附近行动，对现住地只知名称，不知道方位</option>
+                    <option value="3">时间观念很差，年、月、日不清楚，可知上午或下午；只能在左邻右舍间串门，对现住地不知名称和方位</option>
+                    <option value="4">无时间观念；不能单独外出</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">人物定向</label>
+            <div class="layui-input-block">
+                <select id="people">
+                    <option value="3"></option>
+                    <option value="0">知道周围人们的关系，知道祖孙、叔伯、姑姨、侄子侄女等称谓的意义；可分辨陌生人的大致年龄和身份，可用适当称呼</option>
+                    <option value="1">只知家中亲密近亲的关系，不会分辨陌生人的大致年龄，不能称呼陌生人</option>
+                    <option value="2">只能称呼家中人，或只能照样称呼，不知其关系，不辨辈分</option>
+                    <option value="3">只认识常同住的亲人，可称呼子女或孙子女，可辨熟人和生人</option>
+                    <option value="4">只认识保护人，不辨熟人和生人</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">社会交往能力</label>
+            <div class="layui-input-block">
+                <select id="contact">
+                    <option value="4"></option>
+                    <option value="0">参与社会，在社会环境有一定的适应能力，待人接物恰当</option>
+                    <option value="1">能适应单纯环境，主动接触人，初见面时难让人发现智力问题，不能理解隐喻语</option>
+                    <option value="2">脱离社会，可被动接触，不会主动待人，谈话中很多不适词句，容易上当受骗</option>
+                    <option value="3">勉强可与人交往，谈吐内容不清楚，表情不恰当</option>
+                    <option value="4">难以与人接触</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item" style="display: none">
+        <label class="layui-form-label">登记编号</label>
+        <div class="layui-input-block">
+            <input type="text" id="regno" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">社会参与总分</label>
+            <div class="layui-input-block">
+                <input type="text" name="" readonly id="sum" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">感知觉与沟通等级</label>
+            <div class="layui-input-block">
+                <input type="text" name="" readonly id="grade" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <button type="button" id="rate" class="layui-btn layui-btn-normal">评级</button>
+</form>
+</body>
+<script>
+
+    window.onload = function () {
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURI(r[2]);
+            return null;
+        }
+        $('#regno').val(getQueryString("regno"))
+    }
+    
+    $ = layui.jquery;
+    var life = 0, work = 0, space_time = 0, people = 0, contact = 0, sum = 0
+    $("#rate").on('click', function () {
+        life = parseInt($('#life').val())
+        work = parseInt($('#work').val())
+        space_time = parseInt($('#space_time').val())
+        people = parseInt($('#people').val())
+        contact = parseInt($('#contact').val())
+        sum = life + work + space_time + people + contact
+        $('#sum').val(sum.toString())
+        if (sum >= 0 && sum <= 2) {
+            $('#grade').val('社会参与能力完好')
+        } else if (sum >= 3 && sum <= 7) {
+            $('#grade').val('社会参与轻度受损')
+        } else if (sum >= 8 && sum <= 13) {
+            $('#grade').val('社会参与中度受损')
+        } else if (sum >= 14 && sum <= 20) {
+            $('#grade').val('社会参与重度受损')
+        }
+        $.ajax({
+            type:"post",
+            url:'./grade/updateInvolve',
+            data:{
+                grade:$('#grade').val(),
+                regno:$('#regno').val()
+            },
+            success:function (resp) {
+                if(resp === "success"){
+                    alert("评估成功")
+                    // window.location.href='estimate.html'
+                    window.location.reload();
+                }
+            }
+        })
+    })
+</script>
+</html>

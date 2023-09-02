@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.estimate.mapper.UserMapper">
+    <resultMap id="UserMapper" type="user"></resultMap>
+    <insert id="addUser">
+        insert into user values (null,#{username},#{pwd},#{phone},#{identity})
+    </insert>
+    <select id="findByUsername" resultMap="UserMapper">
+        select * from user where username = #{user.username} and pwd = #{user.pwd} and identity = #{user.identity}
+    </select>
+
+    <select id="findByPage" resultMap="UserMapper">
+        select * from user limit #{begin},#{size};
+    </select>
+    <select id="selectPageTotal" resultType="java.lang.Integer">
+        select count(*)
+        from user;
+    </select>
+
+    <select id="findByPageandCondition" resultMap="UserMapper">
+        select * from user
+        <where>
+            <if test=" user.id != null ">
+                and id = #{user.id}
+            </if>
+            <if test="user.username != null and user.username != ''">
+                or username like #{user.username}
+            </if>
+        </where>
+        limit #{begin},#{size}
+    </select>
+    <select id="selectTotalCondition" resultType="java.lang.Integer">
+        select count(*) from user
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="username != null and username != ''">
+                or username like #{username}
+            </if>
+        </where>
+    </select>
+</mapper>

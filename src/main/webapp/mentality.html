@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>精神状态评估</title>
+    <link rel="stylesheet" href="Layui/layui/css/layui.css">
+    <script src="Layui/layui/layui.js"></script>
+    <style>
+        h2 {
+            font-family: 华文楷体;
+            font-size: 25px;
+            font-weight: bold;
+            margin-left: 43%;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        #rate {
+            margin-left: 60px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+<h2>老年人精神状态等级评估</h2>
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">认知功能</label>
+        <div class="layui-input-block">
+            <select id="cognition">
+                <option value="2"></option>
+                <option value="0">画钟正确（画出一个闭锁圆，指针位置准确），且能回忆出 2-3 个词</option>
+                <option value="1">画钟错误（画的圆不闭锁，或指针位置不准确），或只回忆出 0-1 个词</option>
+                <option value="2"> 已确诊为认知障碍，如老年痴呆</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">攻击行为</label>
+        <div class="layui-input-block">
+            <select id="attack">
+                <option value="2"></option>
+                <option value="0">无身体攻击行为和语言攻击行为</option>
+                <option value="1">每月有几次身体攻击行为，或每周有几次语言攻击行为</option>
+                <option value="2">每周有几次身体攻击行为，或每日有语言攻击行为</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">抑郁症状</label>
+        <div class="layui-input-block">
+            <select id="depress">
+                <option value="2"></option>
+                <option value="0">无</option>
+                <option value="1">情绪低落、不爱说话、不爱梳洗、不爱活动</option>
+                <option value="2">有自杀念头或自杀行为</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item" style="display: none">
+        <label class="layui-form-label">登记编号</label>
+        <div class="layui-input-block">
+            <input type="text" id="regno" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">精神状态总分</label>
+            <div class="layui-input-block">
+                <input type="text" name="" readonly id="sum" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">精神状态等级</label>
+            <div class="layui-input-block">
+                <input type="text" name="" readonly id="grade" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <button type="button" id="rate" class="layui-btn layui-btn-normal">评级</button>
+</form>
+</body>
+<script>
+
+    window.onload = function () {
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURI(r[2]);
+            return null;
+        }
+        $('#regno').val(getQueryString("regno"))
+    }
+
+    $ = layui.jquery;
+    var cognition = 0, attack = 0, depress = 0,sum = 0;
+    $("#rate").on('click', function () {
+        cognition = parseInt($('#cognition').val())
+        attack = parseInt($('#attack').val())
+        depress = parseInt($('#depress').val())
+        sum = cognition + attack +depress
+        $('#sum').val(sum.toString())
+        if(sum === 0){
+            $('#grade').val('精神状态能力完好')
+        }else if(sum === 1){
+            $('#grade').val('精神状态轻度受损')
+        }else if(sum === 2 || sum === 3){
+            $('#grade').val('精神状态重度受损')
+        }else {
+            $('#grade').val('精神状态重度受损')
+        }
+
+        $.ajax({
+            type:"post",
+            url:"./grade/updatePsychosis",
+            data:{
+                grade:$('#grade').val(),
+                regno:$('#regno').val()
+            },
+            success:function (resp) {
+                if(resp==="success"){
+                    setTimeout(function () {
+                        window.location.href='perception.html?regno='+$('#regno').val()
+                    },2000)
+                }
+            }
+        })
+    })
+</script>
+</html>

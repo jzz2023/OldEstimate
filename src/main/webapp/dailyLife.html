@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>日常生活评估</title>
+    <link rel="stylesheet" href="Layui/layui/css/layui.css">
+    <script src="Layui/layui/layui.js"></script>
+    <style>
+        h2 {
+            font-family: 华文楷体;
+            font-size: 25px;
+            font-weight: bold;
+            margin-left: 43%;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        #rate {
+            margin-left: 60px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+<h2>老年人日常生活等级评估</h2>
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">进食</label>
+        <div class="layui-input-block">
+            <select id="eat">
+                <option value="0"></option>
+                <option value="10">可独立进食</option>
+                <option value="5">需部分帮助</option>
+                <option value="0"> 需极大帮助或完全依赖他人，或有留置营养管</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">洗澡</label>
+        <div class="layui-input-block">
+            <select id="bathe">
+                <option value="0"></option>
+                <option value="5">准备好洗澡水后，可自己独立完成洗澡过程</option>
+                <option value="0"> 在洗澡过程中需他人帮助</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">修饰</label>
+        <div class="layui-input-block">
+            <select id="dress">
+                <option value="0"></option>
+                <option value="5">可自己独立完成</option>
+                <option value="0"> 需他人帮助</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">穿衣</label>
+        <div class="layui-input-block">
+            <select id="clothe">
+                <option value="0"></option>
+                <option value="10">可独立完成</option>
+                <option value="5">需部分帮助</option>
+                <option value="0"> 需极大帮助或完全依赖他人</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">大便控制</label>
+        <div class="layui-input-block">
+            <select id="shit">
+                <option value="0"></option>
+                <option value="10">可控制大便</option>
+                <option value="5">偶尔失控（每周<1 次），或需要他人提示</option>
+                <option value="0">完全失控</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">小便控制</label>
+        <div class="layui-input-block">
+            <select id="urine">
+                <option value="0"></option>
+                <option value="10">可控制小便</option>
+                <option value="5">偶尔失控（每天<1 次），或需要他人提示</option>
+                <option value="0">完全失控，或留置导尿管</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">如厕</label>
+        <div class="layui-input-block">
+            <select id="toilte">
+                <option value="0"></option>
+                <option value="10">可独立完成</option>
+                <option value="5">需部分帮助（需他人搀扶去厕所、需他人帮忙冲水或整理衣裤等）</option>
+                <option value="0">需极大帮助或完全依赖他人</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">床椅转移</label>
+        <div class="layui-input-block">
+            <select id="motion">
+                <option value="0"></option>
+                <option value="15">可独立完成</option>
+                <option value="10">需部分帮助（需他人搀扶或使用拐杖）</option>
+                <option value="5">需极大帮助（较大程度上依赖他人搀扶和帮助）</option>
+                <option value="0">完全依赖他人</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">平地行走</label>
+        <div class="layui-input-block">
+            <select id="movego">
+                <option value="0"></option>
+                <option value="15">可独立在平地上行走 45m</option>
+                <option value="10">需部分帮助</option>
+                <option value="5">需极大帮助</option>
+                <option value="0">完全依赖他人</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">上下楼梯</label>
+        <div class="layui-input-block">
+            <select id="stairs">
+                <option value="0"></option>
+                <option value="10">可独立上下楼梯（连续上下 10-15 个台阶）</option>
+                <option value="5">需部分帮助（需他人搀扶，或扶着楼梯、使用拐杖等）</option>
+                <option value="0">需极大帮助或完全依赖他人</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item" style="display: none">
+        <label class="layui-form-label">登记编号</label>
+        <div class="layui-input-block">
+            <input type="text" id="regno" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">评估总分</label>
+            <div class="layui-input-block">
+                <input type="text" name="" readonly id="sum" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">评估等级</label>
+            <div class="layui-input-block">
+                <input type="text" name="" readonly id="grade" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <button type="button" id="rate" class="layui-btn layui-btn-normal">评估</button>
+</form>
+</body>
+<script>
+    window.onload = function () {
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURI(r[2]);
+            return null;
+        }
+        $('#regno').val(getQueryString("regno"))
+    }
+
+</script>
+<script>
+    $ = layui.jquery;
+    var eat = 0,bathe = 0,dress = 0,clothe = 0,shit = 0,
+        urine = 0,toilte = 0,motion = 0,movego = 0,stairs = 0,sum = 0;
+    $("#rate").on('click',function () {
+        eat = parseInt($('#eat').val())
+        bathe = parseInt($('#bathe').val())
+        dress = parseInt($('#dress').val())
+        clothe = parseInt($('#clothe').val())
+        shit = parseInt($('#shit').val())
+        urine = parseInt($('#urine').val())
+        toilte = parseInt($('#toilte').val())
+        motion = parseInt($('#motion').val())
+        stairs = parseInt($('#stairs').val())
+        sum = eat + bathe + dress + clothe + shit +urine + toilte + motion + stairs
+        $('#sum').val(sum.toString())
+        if(sum >= 95 && sum <= 100){
+            $('#grade').val('日常生活能力完好')
+        }else if(sum < 95 && sum >= 65){
+            $('#grade').val('日常生活轻度受损')
+        }else if(sum < 65 && sum >= 45){
+            $('#grade').val('日常生活中度受损')
+        }else if(sum < 45){
+            $('#grade').val('日常生活重度受损')
+        }
+
+        $.ajax({
+            type:'post',
+            url:'./grade/updateDaily',
+            data:{
+                regno:$('#regno').val(),
+                grade:$('#grade').val()
+            },
+            success:function (resp) {
+                if(resp==="success"){
+                    setTimeout(function () {
+                        window.location.href = 'mentality.html?regno='+$('#regno').val()
+                    },2000)
+                }
+            }
+        })
+    })
+
+</script>
+</html>

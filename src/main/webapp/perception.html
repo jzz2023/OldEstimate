@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>感知觉与沟通评估</title>
+    <link rel="stylesheet" href="Layui/layui/css/layui.css">
+    <script src="Layui/layui/layui.js"></script>
+    <style>
+        h2 {
+            font-family: 华文楷体;
+            font-size: 25px;
+            font-weight: bold;
+            margin-left: 43%;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        #rate {
+            margin-left: 60px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+<h2>老年人感知觉与沟通评估</h2>
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">意识水平</label>
+        <div class="layui-input-block">
+            <select id="conscious" lay-filter="conscious">
+                <option value="3"></option>
+                <option value="0">神志清醒，对周围环境警觉</option>
+                <option value="1">嗜睡</option>
+                <option value="2">昏睡</option>
+                <option value="3">昏迷</option>
+            </select>
+        </div>
+    </div>
+    <div id="others">
+        <div class="layui-form-item">
+            <label class="layui-form-label">视力</label>
+            <div class="layui-input-block">
+                <select id="vision">
+                    <option value="4"></option>
+                    <option value="0">能看清书报上的标准字体</option>
+                    <option value="1">能看清楚大字体，但看不清书报上的标准字体</option>
+                    <option value="2">视力有限，看不清报纸大标题，但能辨认物体</option>
+                    <option value="3">辨认物体有困难，但眼睛能跟随物体移动，只能看到光、颜色和形状</option>
+                    <option value="4">没有视力，眼睛不能跟随物体移动</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">听力</label>
+            <div class="layui-input-block">
+                <select id="hear">
+                    <option value="4"></option>
+                    <option value="0">可正常交谈，能听到电视、电话、门铃的声音</option>
+                    <option value="1">在轻声说话或说话距离超过 2 米时听不清</option>
+                    <option value="2">正常交流有些困难，需在安静的环静或大声说话才能听到</option>
+                    <option value="3">讲话者大声说话或说话很慢，才能部分听见</option>
+                    <option value="4">完全听不见</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">沟通交流</label>
+            <div class="layui-input-block">
+                <select id="communication">
+                    <option value="3"></option>
+                    <option value="0">无困难，能与他人正常沟通和交流</option>
+                    <option value="1">能够表达自己的需要及理解别人的话，但需要增加时间或给予帮助</option>
+                    <option value="2">表达需要或理解有困难，需频繁重复或简化口头表达</option>
+                    <option value="3">不能表达需要或理解他人的话</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item" style="display: none">
+        <label class="layui-form-label">登记编号</label>
+        <div class="layui-input-block">
+            <input type="text" id="regno" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">感知觉与沟通等级</label>
+            <div class="layui-input-block">
+                <input type="text" name="" readonly id="grade" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <button type="button" id="rate" class="layui-btn layui-btn-normal">评级</button>
+</form>
+</body>
+<script>
+
+    window.onload = function () {
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURI(r[2]);
+            return null;
+        }
+        $('#regno').val(getQueryString("regno"))
+    }
+
+    $ = layui.jquery;
+    var form = layui.form;
+    form.on('select(conscious)', function (obj) {
+        if ($('#conscious').get(0).selectedIndex == 0) {
+            $('#others').css('display', 'none')
+            $('#grade').val('重度受损')
+        } else {
+            $('#others').css('display', 'block')
+        }
+    })
+    var conscious = 0, vision = 0, hear = 0, communication = 0, sum = 0
+    $("#rate").on('click', function () {
+        conscious = parseInt($('#conscious').val())
+        vision = parseInt($('#vision').val())
+        hear = parseInt($('#hear').val())
+        communication = parseInt($('#communication').val())
+        sum = conscious + vision + hear + communication
+        if(sum >=0 && sum <= 3){
+            $('#grade').val('沟通感知能力完好')
+        }else if(sum >= 4 && sum <= 7){
+            $('#grade').val('沟通感知轻度受损')
+        }else if(sum >= 8 && sum <= 11){
+            $('#grade').val('沟通感知中度受损')
+        }else if(sum >= 12){
+            $('#grade').val('沟通感知重度受损')
+        }
+
+        $.ajax({
+            type:"post",
+            url:'./grade/updateSense',
+            data:{
+                grade:$('#grade').val(),
+                regno:$('#regno').val()
+            },
+            success:function (resp) {
+                setTimeout(function () {
+                    window.location.href='society.html?regno='+$('#regno').val()
+                },2000)
+            }
+        })
+    })
+</script>
+</html>

@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>老年人能力评估</title>
+    <link rel="stylesheet" href="Layui/layui/css/layui.css">
+    <script src="Layui/layui/layui.js"></script>
+    <script src="JS/echart.js"></script>
+    <style>
+        p {
+            font-size: 18px;
+            font-weight: bold;
+            font-family: 华文楷体;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs layui-bg-black">系统管理</div>
+    </div>
+
+    <div class="layui-side layui-bg-black" id="left_nav">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+
+                <li class="layui-nav-item">
+                    <a href="javascript:getOlder();">老年人信息查询</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a class="" href="javascript:;"><i style="margin-left: 10px"></i>数据直观显示</a>
+                    <dl class="layui-nav-child">
+                        <dd><a class="layui-icon layui-icon-picture" href="javascript:getEchart();">老年人等级直观图</a></dd>
+                        <dd><a class="layui-icon layui-icon-tree" href="javascript:;">树形结构</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">系统设置</a>
+                    <dl class="layui-nav-child">
+                        <dd><a class="layui-icon layui-icon-user" href="javascript:getUserList();">用户列表</a></dd>
+                        <dd><a class="layui-icon layui-icon-about" href="javascript:getAbout();">关于系统</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">能力评估设置</a>
+                    <dl class="layui-nav-child">
+                        <dd><a class="layui-icon layui-icon-edit" href="javascript:setDisease();">常见疾病设置</a></dd>
+                        <dd>
+                            <a href="javascript:getGrade();">等级判定</a>
+                        </dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a class="layui-icon layui-icon-close" href="index.html">退出系统</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+
+        <!--疾病评定-->
+        <form class="layui-form" id="common_dis" style="display: none">
+            <div class="layui-form-item">
+                <label class="layui-form-label">疾病名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="" lay-verify="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">疾病等级</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="" value="高危疾病" title="高危疾病">
+                    <input type="radio" name="" value="普通疾病" title="普通疾病">
+                    <input type="radio" name="" value="常见疾病" title="常见疾病">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">疾病描述</label>
+                <div class="layui-input-block">
+                    <textarea placeholder="请输入内容" class="layui-textarea" name="desc"></textarea>
+                </div>
+            </div>
+        </form>
+
+        <div id="about" style="display: none">
+            <p>&nbsp;&nbsp;该系统是一个老年人能力评估系统，能够评估老年人的一些基本能力，从而让老人准确知道自己的身体状况。
+                同样，也帮助养老院等机构针对老年人做出最正确的护理。
+            </p>
+            <p>&nbsp;&nbsp;用户分为管理员、评估人员、普通用户，管理员负责监控信息，评估人员负责对老人身体状况进行评价，
+                普通用户只能在授权的状态下查看老人的身体状况，对老人的身体状况和精神状况进行24小时的保护。
+            </p>
+            <p>
+                &nbsp;&nbsp;目前该系统仍在开发中，如有问题，请联系我。qq:2285769360
+            </p>
+        </div>
+
+        <!--添加评估老人-->
+        <form class="layui-form" id="add_Data" style="padding: 25px;display: none">
+            <div class="layui-form-item">
+                <label class="layui-form-label">评估编号</label>
+                <div class="layui-input-block">
+                    <input type="text" name="estimate_id" id="es_id" placeholder="请输入评估编号" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" style="white-space:nowrap">评估基准日期</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="es_data" id="date" lay-verify="date" placeholder="年-月-日"
+                               autocomplete="off"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">评估原因</label>
+                <div class="layui-input-block">
+                    <select name="es_case" lay-filter="case" id="es_case">
+                        <option value=""></option>
+                        <option value="接受服务前初评">接受服务前初评</option>
+                        <option value="接受服务后的常规评估">接受服务后的常规评估</option>
+                        <option value="状况发生变化后的即时评估">状况发生变化后的即时评估</option>
+                        <option value="因评估结果有疑问进行的复评">因评估结果有疑问进行的复评</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">姓名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="estimate_name" id="es_name" autocomplete="off" placeholder="请输入姓名"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">性别</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="sex" value="男" title="男">
+                    <input type="radio" name="sex" value="女" title="女">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">出生日期</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="es_birth" id="birth_date" lay-verify="date" placeholder="年-月-日"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">身份证号</label>
+                <div class="layui-input-block">
+                    <input type="text" name="IDCard" id="id_card" onKeyUp="value=value.replace(/[\W]/g,'')"
+                           autocomplete="off"
+                           placeholder="请输入身份证号" maxlength="18" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">社保卡号</label>
+                <div class="layui-input-block">
+                    <input type="text" name="card" id="shebao" onKeyUp="value=value.replace(/[\W]/g,'')"
+                           autocomplete="off"
+                           placeholder="请输入社保卡号" maxlength="9" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">民族</label>
+                <div class="layui-input-inline">
+                    <select name="nation" lay-filter="nation_sel" id="nation">
+                        <option value=""></option>
+                        <option value="汉族">汉族</option>
+                        <option value="少数民族">少数民族</option>
+                    </select>
+                </div>
+                <div class="layui-inline" style="display: none" id="small_nation">
+                    <label class="layui-form-label" style="white-space:nowrap;">民族名称</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="nation" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">文化程度</label>
+                <div class="layui-input-block">
+                    <select name="educate" lay-filter="" id="educate">
+                        <option value=""></option>
+                        <option value="文盲">文盲</option>
+                        <option value="小学">小学</option>
+                        <option value="初中">初中</option>
+                        <option value="高中/技校/中专">高中/技校/中专</option>
+                        <option value="大学专科及以上">大学专科及以上</option>
+                        <option value="不详">不详</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">宗教信仰</label>
+                <div class="layui-input-inline">
+                    <select name="orgion" lay-filter="religion_sel" id="religion">
+                        <option value=""></option>
+                        <option value="无">无</option>
+                        <option value="有">有</option>
+                    </select>
+                </div>
+                <div class="layui-inline" style="display: none" id="has_religion">
+                    <label class="layui-form-label" style="white-space:nowrap;">宗教名称</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="orgion" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">婚姻状况</label>
+                <div class="layui-input-block">
+                    <select name="marry" lay-filter="" id="marry">
+                        <option value=""></option>
+                        <option value="未婚">未婚</option>
+                        <option value="已婚">已婚</option>
+                        <option value="丧偶">丧偶</option>
+                        <option value="离婚">离婚</option>
+                        <option value="未说明婚姻状况">未说明婚姻状况</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">居住情况</label>
+                <div class="layui-input-block">
+                    <select name="live_status" lay-filter="" id="l_status">
+                        <option value=""></option>
+                        <option value="独居">独居</option>
+                        <option value="与配偶/伴侣居住">与配偶/伴侣居住</option>
+                        <option value="与子女居住">与子女居住</option>
+                        <option value="与父母居住">与父母居住</option>
+                        <option value="与兄弟姐妹居住">与兄弟姐妹居住</option>
+                        <option value="与其他亲属居住">与其他亲属居住</option>
+                        <option value="与非亲属关系的人居住">与非亲属关系的人居住</option>
+                        <option value="养老机构">养老机构</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">医疗费用支付方式</label>
+                <div class="layui-input-inline">
+                    <select name="medical" lay-filter="medical" id="medical">
+                        <option value=""></option>
+                        <option value="城镇职工基本医疗保险">城镇职工基本医疗保险</option>
+                        <option value="城镇居民基本医疗保险">城镇居民基本医疗保险</option>
+                        <option value="新型农村合作医疗">新型农村合作医疗</option>
+                        <option value="贫困救助">贫困救助</option>
+                        <option value="商业医疗保险">商业医疗保险</option>
+                        <option value="全公费">全公费</option>
+                        <option value="全自费">全自费</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div class="layui-inline" style="display: none" id="medical_other">
+                    <label class="layui-form-label" style="white-space:nowrap;">其他方式</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="medical" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">经济来源</label>
+                <div class="layui-input-inline">
+                    <select name="economy" lay-filter="economy" id="economy">
+                        <option value=""></option>
+                        <option value="退休金/养老金">退休金/养老金</option>
+                        <option value="子女补贴">子女补贴</option>
+                        <option value="亲友资助">亲友资助</option>
+                        <option value="其他补贴">其他补贴</option>
+                    </select>
+                </div>
+                <div class="layui-inline" style="display: none" id="economy_other">
+                    <label class="layui-form-label" style="white-space:nowrap;">其他补贴</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="economy" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">疾病诊断</label>
+                <div class="layui-input-inline">
+                    <select name="sick" lay-filter="sick" id="sick">
+                        <option value=""></option>
+                        <option value="痴呆">痴呆</option>
+                        <option value="精神疾病">精神疾病</option>
+                        <option value="慢性疾病">慢性疾病</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline" style="display: none" id="sick_dementia">
+                    <select name="sick">
+                        <option value=""></option>
+                        <option value="无">无</option>
+                        <option value="轻度">轻度</option>
+                        <option value="中度">中度</option>
+                        <option value="重度">重度</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline" style="display: none" id="sick_image">
+                    <select name="sick">
+                        <option value=""></option>
+                        <option value="无">无</option>
+                        <option value="精神分裂症">精神分裂症</option>
+                        <option value="双相情感障碍">双相情感障碍</option>
+                        <option value="偏执性精神障碍">偏执性精神障碍</option>
+                        <option value="分裂情感性障碍">分裂情感性障碍</option>
+                        <option value="癫痫所致精神障碍">癫痫所致精神障碍</option>
+                        <option value="精神发育迟滞伴发精神障碍">精神发育迟滞伴发精神障碍</option>
+                    </select>
+                </div>
+                <div class="layui-inline" style="display: none" id="sick_slow">
+                    <label class="layui-form-label" style="white-space:nowrap;">慢性病</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="sick" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">近30天内意外事件</label>
+                <div class="layui-input-inline">
+                    <select name="accident" lay-filter="accident" id="accident">
+                        <option value=""></option>
+                        <option value="跌倒">跌倒</option>
+                        <option value="走失">走失</option>
+                        <option value="噎食">噎食</option>
+                        <option value="自杀">自杀</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline" style="display: none" id="accident_num">
+                    <select name="accident">
+                        <option value="0">无</option>
+                        <option value="1次">1次</option>
+                        <option value="2次">2次</option>
+                        <option value=">=3次">3次及以上</option>
+                    </select>
+                </div>
+                <div class="layui-inline" style="display: none" id="accident_other">
+                    <label class="layui-form-label" style="white-space:nowrap;">其他</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="accident" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">信息提供者姓名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="p_name" id="p_name" lay-verify="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">信息提供者与老人关系</label>
+                <div class="layui-input-inline">
+                    <select name="relation" lay-filter="relation" id="relation">
+                        <option value=""></option>
+                        <option value="配偶">配偶</option>
+                        <option value="子女">子女</option>
+                        <option value="其他亲属">其他亲属</option>
+                        <option value="雇佣照顾着">雇佣照顾着</option>
+                        <option value="0">其他</option>
+                    </select>
+                </div>
+                <div class="layui-inline" style="display: none" id="relation_other">
+                    <label class="layui-form-label" style="white-space:nowrap;">其他</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="relation" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">联系人姓名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="r_name" id="r_name" lay-verify="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">联系人电话</label>
+                <div class="layui-input-block">
+                    <input type="text" name="r_phone" id="r_phone" lay-verify="" maxlength="11"
+                           onkeyup="this.value=this.value.replace(/\D/g,'')" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </form>
+
+        <div class="layui-upload-drag" id="test10" style="display: none">
+            <input type="file" name="filename" id="upload_file">
+            <input type="button" onclick="uploadfile()" value="上传">
+        </div>
+        <!-- 内容主体区域 ,显示表格-->
+        <div style="padding: 15px;" id="test_table">
+            <div class="demoTable" style="padding: 15px" id="inline_form">
+                评估编号：
+                <div class="layui-inline">
+                    <input class="layui-input" name="" id="estimate_id" autocomplete="off">
+                </div>
+                姓名：
+                <div class="layui-inline">
+                    <input class="layui-input" name="" id="estimate_name" autocomplete="off">
+                </div>
+                <button class="layui-btn" data-type="reload" id="search">检索</button>
+            </div>
+            <table class="layui-hide" id="test" lay-filter="test"></table>
+
+            <script type="text/html" id="toolbarDemo">
+                <div class="layui-btn-container">
+                    <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
+                    <button class="layui-btn layui-btn-sm" lay-event="upload">上传文件</button>
+                    <button class="layui-btn layui-btn-sm" lay-event="add">老年人登记</button>
+                    <button class="layui-btn layui-btn-sm" lay-event="flush">刷新</button>
+                </div>
+            </script>
+
+            <script type="text/html" id="barDemo">
+                <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+                <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+            </script>
+
+        </div>
+
+        <!--信息查看、修改弹出框-->
+        <div id="editOlder" style="display: none">
+            <form class="layui-form" lay-filter="editForm">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">评估编号</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_id" id="tel_id" readonly class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label" style="white-space:nowrap">评估基准日期</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="tel_esdate" id="tel_esdate" placeholder="年-月-日"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">评估原因</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_case" id="tel_case" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">老人姓名</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_esname" id="tel_esname" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">性别</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_sex" id="tel_sex" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label" style="white-space:nowrap">出生日期</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="tel_birdate" id="tel_birdate" placeholder="年-月-日"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">身份证号</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_idcard" id="tel_idcard" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">社保卡号</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_shebao" id="tel_shebao" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">民族</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_nation" id="tel_nation" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">文化程度</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_educate" id="tel_educate" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">宗教信仰</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_orgion" id="tel_orgion" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">婚姻状况</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_marry" id="tel_marry" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">居住情况</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_lstatus" id="tel_lstatus" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">医疗费用</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_medical" id="tel_medical" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">经济来源</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_economy" id="tel_economy" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">疾病诊断</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_sick" id="tel_sick" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">近30天意外事件</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_accident" id="tel_accident" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">信息提供者姓名</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_pname" id="tel_pname" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">与老人关系</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_relation" id="tel_relation" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">联系人姓名</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_rname" id="tel_rname" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">联系人电话</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tel_rphone" id="tel_rphone" class="layui-input">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!--iframe用于显示一些内容-->
+        <iframe src="" frameborder="0" id="demoAdmin" style="display: none;width: 100%; height: 100%; border-radius: 2px;"></iframe>
+
+        <!--可视化显示数据-->
+        <div id="data_echart" style="display: none">
+            <!--日常生活-->
+            <div id="grade_estimate" style="width: 500px;height: 450px;float: left"></div>
+            <!--精神状态-->
+            <div id="psychosis" style="width: 500px;height: 450px;float: left"></div>
+            <!--感知觉与沟通-->
+            <div id="sense" style="width: 500px;height: 450px;float: left"></div>
+            <!--社会参与-->
+            <div id="involve" style="width: 500px;height: 450px;float: left"></div>
+
+            <div id="data_number" style="width: 900px;height: 500px;float:left;"></div>
+
+        <!--根据图形弹出的数据表格-->
+            <div id="echart_reload" style="display: none;">
+                <div class="demoTable">
+                    老人姓名：
+                    <div class="layui-inline">
+                        <input class="layui-input" name="id" id="demoReload" autocomplete="off">
+                    </div>
+                    <button class="layui-btn" data-type="reload">搜索</button>
+                </div>
+
+                <table class="layui-hide" id="table_echart" lay-filter="user"></table>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="layui-footer">
+
+    </div>
+</div>
+<script>
+    //JS
+    var table = layui.table;
+    var element = layui.element;
+    var layer = layui.layer
+        , util = layui.util
+        , upload = layui.upload;
+    var laydate = layui.laydate;
+    var form = layui.form;
+    var test_table = document.getElementById("test_table"); //页面加载完之后主体表格
+    var demoAdmin = document.getElementById("demoAdmin");
+    var $ = layui.jquery;
+
+    //获取用户列表
+    function getUserList() {
+        $("#demoAdmin").attr("src", "userList.html");
+        demoAdmin.style.display = "block";
+        test_table.style.display = "none";
+        $("#data_echart").css('display','none');
+    }
+
+    function getGrade() {
+        $("#demoAdmin").attr("src", "egrade.html");
+        demoAdmin.style.display = "block";
+        test_table.style.display = "none";
+        $('#data_echart').css('display', 'none')
+        // $('#left_nav').css('display','none')
+    }
+
+    //获取等级直观图
+    function getEchart() {
+        $('#data_echart').css('display', 'block')
+        $('#demoAdmin').css('display', 'none')
+        $('#test_table').css('display', 'none')
+
+    }
+
+    //老年人信息查询
+    function getOlder() {
+        test_table.style.display = "block";
+        demoAdmin.style.display = "none";
+        $('#data_echart').css('display', 'none')
+    }
+
+    //信息界面
+    function getAbout() {
+        layer.open({
+            type: 1,
+            title: '关于系统',
+            area: ['450px', '100%'],
+            offset: 'rb',
+            anim: 2,
+            content: $('#about').html(),
+            success: res => {
+                // 成功回调处理
+            }
+        });
+    }
+
+    //设置常见疾病
+    function setDisease() {
+        var disease = document.getElementById("common_dis")
+        layer.open({
+            type: 1,
+            title: "常见疾病设置",
+            area: ["50%", "45%"],
+            content: $("#common_dis"),
+            btn: ['提交', '取消'],
+            shade: 0,
+            btn2: function () {
+                disease.style.display = "none";
+            },
+            btnAlign: "c"
+        })
+    }
+
+    laydate.render({
+        elem: '#date'
+    });
+    laydate.render({
+        elem: '#birth_date'
+    });
+    laydate.render({
+        elem: "#tel_esdate"
+    })
+    laydate.render({
+        elem: "#tel_birdate"
+    })
+
+    window.onload = function () {
+        loadTable();
+    }
+
+    //条件查询，表格重载
+    $("#search").on('click', function () {
+        estimateTable.reload({
+            url: 'http://localhost:8080/OldEstimate/estimate/selectByPageandCondition',
+            where: {
+                estimate_id: $("#estimate_id").val(),
+                estimate_name: $("#estimate_name").val(),
+            },
+            page: {
+                curr: 1
+            }
+        })
+        return false;
+    })
+
+    function loadTable() {
+        estimateTable = table.render({
+            elem: '#test'
+            , url: 'http://localhost:8080/OldEstimate/estimate/selectByPage'
+            , method: "post"
+            , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            , defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                , layEvent: 'LAYTABLE_TIPS'
+                , icon: 'layui-icon-tips'
+            }]
+            , title: '用户数据表'
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'estimate_id', title: '评估编号', fixed: 'left', unresize: true, sort: true}
+                , {field: 'es_date', title: '评估日期', edit: 'text'}
+                , {field: 'es_case', title: '评估原因', edit: 'text'}
+                , {field: 'estimate_name', title: '老人姓名'}
+                // , {field: 'sex', title: '性别'}
+                // , {field: 'es_birth', title: '出生日期', sort: true}
+                , {field: 'iDCard', title: '身份证号'}
+                // , {field: 'card', title: '社保卡号', sort: true}
+                // , {field: 'nation', title: '民族'}
+                // , {field: 'educate', title: '文化程度'}
+                // , {field: 'orgion', title: '宗教信仰'}
+                // , {field: 'marry', title: '婚姻状况'}
+                // , {field: 'live_status', title: '居住情况'}
+                // , {field: 'medical', title: '医疗费用支付方式'}
+                // , {field: 'economy', title: '经济来源'}
+                // , {field: 'sick', title: '疾病诊断'}
+                // , {field: 'accident', title: '近30天内意外事件'}
+                , {field: 'p_name', title: '信息提供者姓名'}
+                , {field: 'relation', title: '其与老人关系'}
+                , {field: 'r_name', title: '联系人姓名'}
+                , {field: 'r_phone', title: '联系人电话'}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 180}
+            ]]
+            , page: true
+            , limit: 5
+            , limits: [5, 10, 15, 20]
+            , parseData: function (res) {
+                return {
+                    "code": 0,
+                    "msg": "",
+                    "count": res.totalCount,
+                    data: res.rows
+                }
+            }
+            , data: [{
+                "estimate_id": "001",
+                "es_date": "2020-10-01",
+                "es_case": "年龄大了",
+                "estimate_name": "一二三",
+                "sex": "男",
+                "es_birth": "1965-10-09",
+                "iDCard": "123456789027638",
+                "card": "123456789",
+                "nation": "汉",
+                "educate": "小学",
+                "orgion": "佛教",
+                "marry": "丧偶",
+                "live_status": "和子女居住",
+                "medical": "全公费",
+                "economy": "退休金",
+                "sick": "轻度痴呆",
+                "accident": "无",
+                "p_name": "张三",
+                "relation": "父子",
+                "r_name": "张三",
+                "r_phone": "8902617283",
+            }],
+        });
+    }
+
+
+    //表单filter事件
+    form.on('select(nation_sel)', function (obj) {
+        var small_nation = $("#nation").val();
+        var in_sm_nation = document.getElementById("small_nation");
+        if (small_nation == "少数民族") {
+            in_sm_nation.style.display = "block";
+        } else {
+            in_sm_nation.style.display = "none";
+        }
+    })
+    form.on('select(religion_sel)', function (obj) {
+        var religion = $("#religion").val();
+        var has_religion = document.getElementById("has_religion");
+        if (religion == "有") {
+            has_religion.style.display = "block";
+        } else {
+            has_religion.style.display = "none";
+        }
+    })
+    form.on('select(medical)', function (obj) {
+        var medical = $("#medical").val();
+        var medical_other = document.getElementById("medical_other");
+        if (medical == "其他") {
+            medical_other.style.display = "block";
+        } else {
+            medical_other.style.display = "none";
+        }
+    })
+    form.on('select(economy)', function (obj) {
+        var economy = $("#economy").val();
+        var economy_other = document.getElementById("economy_other");
+        if (economy == "其他补贴") {
+            economy_other.style.display = "block";
+        } else {
+            economy_other.style.display = "none";
+        }
+    })
+    form.on('select(sick)', function (obj) {
+        var sick = $("#sick").val();
+        var sick_dementia = document.getElementById("sick_dementia");
+        var sick_image = document.getElementById("sick_image");
+        var sick_slow = document.getElementById("sick_slow");
+        if (sick == "痴呆") {
+            sick_dementia.style.display = "block";
+            sick_image.style.display = "none";
+            sick_slow.style.display = "none"
+        } else if (sick == "精神疾病") {
+            sick_image.style.display = "block";
+            sick_dementia.style.display = "none";
+            sick_slow.style.display = "none"
+        } else if (sick == "慢性疾病") {
+            sick_slow.style.display = "block"
+            sick_dementia.style.display = "none";
+            sick_image.style.display = "none";
+        } else {
+            sick_dementia.style.display = "none";
+            sick_image.style.display = "none";
+            sick_slow.style.display = "none"
+        }
+    })
+    form.on('select(accident)', function (obj) {
+        var accident = $("#accident").val();
+        var accident_num = document.getElementById("accident_num");
+        var accident_other = document.getElementById("accident_other");
+        if (accident != "其他") {
+            accident_num.style.display = "block";
+            accident_other.style.display = "none"
+        } else if (accident == "其他") {
+            accident_other.style.display = "block";
+            accident_num.style.display = "none"
+        } else {
+            accident_num.style.display = "none";
+            accident_other.style.display = "none"
+        }
+    })
+
+    form.on('select(relation)', function (obj) {
+        var value = $("#relation").val();
+        var relation_other = document.getElementById("relation_other");
+        if (value == 0) {
+            relation_other.style.display = "block";
+        } else {
+            relation_other.style.display = "none";
+        }
+    })
+    //头工具栏事件
+    table.on('toolbar(test)', function (obj) {
+        var checkStatus = table.checkStatus(obj.config.id);
+        var add_data = document.getElementById("add_Data");
+        switch (obj.event) {
+            case 'getCheckData':
+                var data = checkStatus.data;
+                layer.alert(JSON.stringify(data));
+                break;
+            case 'upload':
+                layer.open({
+                    title: "文件上传",
+                    type: 1,
+                    shade: 0,
+                    area: ['400px', '300px'],
+                    content: $("#test10")
+                })
+                break;
+            case 'add':
+                layer.open({
+                    title: "数据评估",
+                    type: 1,
+                    area: ['60%', '80%'],
+                    shade: 0.0,
+                    content: $("#add_Data"),
+                    btn: ["提交", "取消"],
+                    btn1: function () {
+                        addestimation();
+                    },
+                    btn2: function () {
+                        add_data.style.display = "none";
+                    },
+                    btnAlign: "c"
+                });
+                break;
+            case 'flush':
+                window.location.reload();
+
+            //自定义头工具栏右侧图标 - 提示
+            case 'LAYTABLE_TIPS':
+                layer.alert('这是工具栏右侧自定义的一个图标按钮');
+                break;
+        }
+        ;
+    });
+
+    function uploadfile() {
+
+    }
+
+
+    //监听行工具事件
+    table.on('tool(test)', function (obj) {
+        var data = obj.data;
+        form.val("editForm", {
+            "tel_id": data.estimate_id,
+            "tel_esdate": data.es_date,
+            "tel_case": data.es_case,
+            "tel_esname": data.estimate_name,
+            "tel_sex": data.sex,
+            "tel_birdate": data.es_birth,
+            "tel_idcard": data.iDCard,
+            "tel_shebao": data.card,
+            "tel_nation": data.nation,
+            "tel_educate": data.educate,
+            "tel_orgion": data.orgion,
+            "tel_marry": data.marry,
+            "tel_lstatus": data.live_status,
+            "tel_medical": data.medical,
+            "tel_economy": data.economy,
+            "tel_sick": data.sick,
+            "tel_pname": data.p_name,
+            "tel_accident": data.accident,
+            "tel_relation": data.relation,
+            "tel_rname": data.r_name,
+            "tel_rphone": data.r_phone
+        })
+        if (obj.event === 'del') {
+            layer.confirm('真的删除该数据吗？', function (index) {
+                $.ajax({
+                    url: 'http://localhost:8080/OldEstimate/estimate/deleteOlder',
+                    type: 'post',
+                    data: {
+                        "estimate_id": data.estimate_id
+                    },
+                    success: function (resp) {
+                        if (resp == "success") {
+                            obj.del();
+                            layer.close(index);
+                        }
+                    }
+                })
+
+            });
+        } else if (obj.event === 'detail') {
+
+            layer.open({
+                title: data.estimate_name + "的登记信息",
+                type: 1,
+                area: ['60%', '80%'],
+                shade: 0.0,
+                content: $("#editOlder")
+            })
+        } else if (obj.event === 'edit') {
+            layer.open({
+                title: data.estimate_name + "的登记信息",
+                type: 1,
+                area: ['60%', '80%'],
+                shade: 0.0,
+                content: $("#editOlder"),
+                btn: ['修改', '取消'],
+                btn1: function () {
+                    $.ajax({
+                        type: 'post',
+                        url: './estimate/updateOlder',
+                        data: {
+                            tel_id: $("#tel_id").val(),
+                            tel_esdate: $("#tel_esdate").val(),
+                            tel_case: $("#tel_case").val(),
+                            tel_esname: $("#tel_esname").val(),
+                            tel_sex: $("#tel_sex").val(),
+                            tel_birdate: $("#tel_birdate").val(),
+                            tel_idcard: $("#tel_idcard").val(),
+                            tel_shebao: $("#tel_shebao").val(),
+                            tel_nation: $("#tel_nation").val(),
+                            tel_educate: $("#tel_educate").val(),
+                            tel_orgion: $("#tel_orgion").val(),
+                            tel_marry: $("#tel_marry").val(),
+                            tel_lstatus: $("#tel_lstatus").val(),
+                            tel_medical: $("#tel_medical").val(),
+                            tel_economy: $("#tel_economy").val(),
+                            tel_sick: $("#tel_sick").val(),
+                            tel_pname: $("#tel_pname").val(),
+                            tel_accident: $("#tel_accident").val(),
+                            tel_relation: $("#tel_relation").val(),
+                            tel_rname: $("#tel_rname").val(),
+                            tel_rphone: $("#tel_rphone").val(),
+                        },
+                        success: function (resp) {
+                            if (resp == "success") {
+                                alert("编辑成功,请刷新")
+                                layer.closeAll();
+                            }
+                        },
+                        error: function () {
+                            alert("编辑失败")
+                            layer.closeAll()
+                        }
+                    })
+                },
+                btn2: function () {
+                    $("#editOlder").css('display', 'none')
+                },
+                btnAlign: 'c'
+            })
+        }
+    });
+
+
+    //添加评估信息
+    function addestimation() {
+        $.ajax({
+            type: "post",
+            url: "http://localhost:8080/OldEstimate/estimate/addOlder",
+            data: {
+                "estimate_id": $("#es_id").val(),
+                "es_date": $("#date").val(),
+                "es_case": $("#es_case").val(),
+                "estimate_name": $("#es_name").val(),
+                "sex": $("input[name='sex']:checked").val(),
+                "es_birth": $("#birth_date").val(),
+                "IDCard": $("#id_card").val(),
+                "card": $("#shebao").val(),
+                "nation": $("select[name='nation']").val() + $("input[name='nation']").val(),
+                "educate": $("#educate").val(),
+                "orgion": $("select[name='orgion']").val() + $("input[name='orgion']").val(),
+                "marry": $("#marry").val(),
+                "live_status": $("#l_status").val(),
+                "medical": $("select[name='medical']").val() + $("input[name='medical']").val(),
+                "economy": $("select[name='economy']").val() + $("input[name='economy']").val(),
+                "sick": $("select[name='sick']").val() + $("input[name='sick']").val(),
+                "accident": $("select[name='accident']").val() + $("input[name='accident']").val(),
+                "p_name": $("#p_name").val(),
+                "relation": $("select[name='relation']").val() + $("input[name='relation']").val(),
+                "r_name": $("#r_name").val(),
+                "r_phone": $("#r_phone").val(),
+            },
+            success: function (res) {
+                if (res == "success") {
+                    alert("登记成功，请刷新页面")
+                    layer.closeAll();
+                    add_data.style.display = "none";
+                }
+            },
+            error: function (res) {
+                if(res=="error"){
+                    alert("登记失败，请重新登记")
+                    layer.closeAll();
+                    add_data.style.display = "none";
+                }
+            }
+        })
+    }
+
+    //头部事件
+    util.event('lay-header-event', {
+        //左侧菜单事件
+        menuLeft: function (othis) {
+            layer.msg('展开左侧菜单的操作', {icon: 0});
+        }
+        , menuRight: function () {
+            layer.open({
+                type: 1
+                , content: '<div style="padding: 15px;">处理右侧面板的操作</div>'
+                , area: ['260px', '100%']
+                , offset: 'rt' //右上角
+                , anim: 5
+                , shadeClose: true
+            });
+        }
+    });
+
+</script>
+<script>
+    //根据图重载表格
+    echart_table = table.render({
+        elem: '#table_echart'
+        ,url: './grade/selectPage'
+        ,method:'post'
+        ,cols: [[
+            {field: 'oldername', title: '老人姓名', fixed: 'left', unresize: true, sort: true}
+            , {field: 'regno', title: '登记编号'}
+            , {field: 'dailylife', title: '日常生活等级'}
+            , {field: 'psychosis', title: '精神状态等级'}
+            , {field: 'sense', title: '感知沟通等级'}
+            , {field: 'involve', title: '社会参与能力'}
+            , {field: 'enumber', title: '评估次数'}
+        ]]
+        ,page: true
+        , limit: 5
+        , limits: [5, 10, 15, 20]
+        , parseData: function (res) {
+            return {
+                "code": 0,
+                "msg": "",
+                "count": res.totalCount,
+                data: res.rows
+            }
+        }
+        , data: [{
+            "oldername": "001",
+            "regno": "002",
+            "dailylife": "年龄大了",
+            "psychosis": "一二三",
+            "sense": "男",
+            "involve": "1965-10-09",
+            "enumber": "3"
+        }]
+    });
+
+    //老年人日常生活等级评估图
+    $.ajax({
+        type: "get",
+        url: 'http://localhost:8080/OldEstimate/grade/getDaily',
+        success: function (resp) {
+            var chartDom = document.getElementById('grade_estimate');
+            var myChart = echarts.init(chartDom);
+            var option;
+            var daily = [];
+            for (let i = 0; i < resp.length; i++) {
+                var obj = new Object();
+                obj.value = resp[i].value;
+                obj.name = resp[i].name;
+                daily[i] = obj
+            }
+            option = {
+                title: {
+                    text: '老年人日常生活等级',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        mark: {show: true},
+                        dataView: {show: true, readOnly: false},
+                        restore: {show: true},
+                        saveAsImage: {show: true}
+                    }
+                },
+                series: [
+                    {
+                        name: '评估数据',
+                        type: 'pie',
+                        radius: '50%',
+                        data: daily,
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            myChart.setOption(option);
+            myChart.on('click',function (params) {
+                dailyReload(params.name)
+            //    弹出表格，并进行重载
+                layer.open({
+                    type:1,
+                    shade:0.0,
+                    content:$('#echart_reload'),
+                    title:'老人等级信息'
+                })
+            })
+        }
+    })
+
+    function dailyReload(val){
+        echart_table.reload({
+            url: './grade/selectPageByDaily',
+            where: {
+                dailylife:val
+            },
+            page: {
+                curr: 1
+            }
+        })
+        return false;
+    }
+
+    //精神状态等级
+    $.ajax({
+        type: 'get',
+        url: 'http://localhost:8080/OldEstimate/grade/getPsychosis',
+        success: function (resp) {
+            var chartDom = document.getElementById('psychosis');
+            var myChart = echarts.init(chartDom);
+            var option;
+            var psychosis = []
+            for (let i = 0; i < resp.length; i++) {
+                var obj = new Object()
+                obj.value = resp[i].value
+                obj.name = resp[i].name
+                psychosis[i] = obj
+            }
+            option = {
+                title: {
+                    text: '老年人精神状态等级',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        mark: {show: true},
+                        dataView: {show: true, readOnly: false},
+                        restore: {show: true},
+                        saveAsImage: {show: true}
+                    }
+                },
+                series: [
+                    {
+                        name: '评估数据',
+                        type: 'pie',
+                        radius: '50%',
+                        data: psychosis,
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            myChart.setOption(option);
+            myChart.on('click',function (params) {
+                psychosisReload(params.name)
+                layer.open({
+                    type:1,
+                    shade:0.0,
+                    content:$('#echart_reload'),
+                    title:'老人等级信息'
+                })
+            })
+        }
+    })
+
+    function psychosisReload(val){
+        echart_table.reload({
+            url: './grade/selectPageByPsychosis',
+            where: {
+                psychosis:val
+            },
+            page: {
+                curr: 1
+            }
+        })
+        return false;
+    }
+
+    //感知觉等级
+    $.ajax({
+        type: 'get',
+        url: 'http://localhost:8080/OldEstimate/grade/getSense',
+        success: function (resp) {
+            var chartDom = document.getElementById('sense');
+            var myChart = echarts.init(chartDom);
+            var option;
+            var sense = []
+            for (let i = 0; i < resp.length; i++) {
+                var obj = new Object()
+                obj.value = resp[i].value
+                obj.name = resp[i].name
+                sense[i] = obj
+            }
+            option = {
+                title: {
+                    text: '老年人感知与沟通等级',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        mark: {show: true},
+                        dataView: {show: true, readOnly: false},
+                        restore: {show: true},
+                        saveAsImage: {show: true}
+                    }
+                },
+                series: [
+                    {
+                        name: '评估数据',
+                        type: 'pie',
+                        radius: '50%',
+                        data: sense,
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            myChart.setOption(option);
+            myChart.on('click',function (params) {
+                senseReload(params.name)
+                layer.open({
+                    type:1,
+                    shade:0.0,
+                    content:$('#echart_reload'),
+                    title:'老人等级信息'
+                })
+            })
+        }
+    })
+
+    function senseReload(val){
+        echart_table.reload({
+            url: './grade/selectPageBySense',
+            where: {
+                sense:val
+            },
+            page: {
+                curr: 1
+            }
+        })
+        return false;
+    }
+
+    //社会参与等级
+    $.ajax({
+        type: 'get',
+        url: 'http://localhost:8080/OldEstimate/grade/getInvolve',
+        success: function (resp) {
+            var chartDom = document.getElementById('involve');
+            var myChart = echarts.init(chartDom);
+            var option;
+            var involve = []
+            for (let i = 0; i < resp.length; i++) {
+                var obj = new Object()
+                obj.value = resp[i].value
+                obj.name = resp[i].name
+                involve[i] = obj
+            }
+            option = {
+                title: {
+                    text: '老年人感知与沟通等级',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        mark: {show: true},
+                        dataView: {show: true, readOnly: false},
+                        restore: {show: true},
+                        saveAsImage: {show: true}
+                    }
+                },
+                series: [
+                    {
+                        name: '评估数据',
+                        type: 'pie',
+                        radius: '50%',
+                        data: involve,
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            myChart.setOption(option);
+            myChart.on('click',function (params) {
+                involveReload(params.name)
+                layer.open({
+                    type:1,
+                    shade:0.0,
+                    content:$('#echart_reload'),
+                    title:'老人等级信息'
+                })
+            })
+        }
+    })
+
+    function involveReload(val){
+        echart_table.reload({
+            url: './grade/selectPageByInvolve',
+            where: {
+                involve:val
+            },
+            page: {
+                curr: 1
+            }
+        })
+        return false;
+    }
+
+    //    老年人评估次数表
+    $.ajax({
+        type: 'get',
+        url: 'http://localhost:8080/OldEstimate/grade/getColumnar',
+        success: function (resp) {
+            var chartDom = document.getElementById('data_number');
+            var myChart = echarts.init(chartDom);
+            var option;
+            var oldername = []
+            var enumber = []
+            for (let i = 0; i < resp.length; i++) {
+                var obj = new Object()
+                obj.name = resp[i].oldername
+                obj.number = resp[i].enumber
+                oldername[i] = obj.name
+                enumber[i] = obj.number
+            }
+            option = {
+                xAxis: {
+                    type: 'category',
+                    data: oldername
+                },
+                tooltip: {},
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        data: enumber,
+                        type: 'bar',
+                        showBackground: true,
+                        backgroundStyle: {
+                            color: 'rgba(180, 180, 180, 0.2)'
+                        }
+                    }
+                ]
+            };
+
+            myChart.setOption(option);
+            myChart.on('click',function (params) {
+                console.log(params)
+            })
+        }
+    })
+</script>
+</body>
+</html>

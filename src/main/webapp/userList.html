@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户列表</title>
+    <link rel="stylesheet" href="Layui/layui/css/layui.css">
+    <script src="Layui/layui/layui.js"></script>
+    <style>
+        #add_user{
+            width: 50%;
+            height: 400px;
+            margin-top: 50px;
+            margin: auto;
+            display: none;
+        }
+        #add_form{
+            padding: 25px;
+        }
+        h2{
+            font-family: 华文楷体;
+            padding-left: 150px;
+            font-weight: bold;
+            font-size: 25px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="demoTable" style="padding: 15px">
+    <div class="layui-inline">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-primary demo1">
+                <span id="inline_span">搜索信息</span>
+                <input type="text" id="condition" hidden>
+                <i class="layui-icon layui-icon-down layui-font-12"></i>
+            </button>
+        </div>
+    </div>
+    <div class="layui-inline">
+        <input type="text" class="layui-input" id="user_input">
+    </div>
+    <button class="layui-btn" id="search">检索</button>
+</div>
+
+
+<table class="layui-hide" id="test" lay-filter="test"></table>
+
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">重置密码</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+</body>
+<script>
+    var table = layui.table;
+    var layer = layui.layer;
+    var $ = layui.jquery,dropdown=layui.dropdown
+
+    userTable = table.render({
+        elem: '#test'
+        ,url:'http://localhost:8080/OldEstimate/user/selectPage'
+        ,method:'post'
+        ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+        ,defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+            title: '提示'
+            ,layEvent: 'LAYTABLE_TIPS'
+            ,icon: 'layui-icon-tips'
+        }]
+        ,title: '用户数据表'
+        ,cols: [[
+            {type: 'checkbox', fixed: 'left'}
+            ,{field: 'id',title: '用户ID',edit: 'text'}
+            ,{field:'username', title:'用户名', edit: 'text'}
+            ,{field:'phone', title:'手机号', edit: 'text'}
+            ,{field:'identity', title:'身份', width:100}
+            ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
+        ]]
+        ,page: true
+        , limit: 5
+        , limits: [5, 10, 15, 20]
+        , parseData: function (res) {
+            return {
+                "code": 0,
+                "msg": "",
+                "count": res.totalCount,
+                data: res.rows
+            }
+        }
+    });
+
+    $('#search').on('click',function () {
+        console.log($('#user_input').val())
+        userTable.reload({
+            url:'./user/selectCondition',
+            where:{
+                condition:$('#condition').val(),
+                user_input:$('#user_input').val()
+            },
+            page:{
+                curr:1
+            }
+        })
+        return false
+    })
+
+    dropdown.render({
+        elem: '.demo1'
+        ,data: [{
+            title: '用户ID'
+            ,id: 100
+        },{
+            title: '用户名'
+            ,id: 101
+        }]
+        ,click: function(obj){
+            // layer.tips('点击了：'+ obj.title, this.elem, {tips: [1, '#5FB878']})
+            $('#condition').val(obj.id)
+            $('#inline_span').html(obj.title)
+        }
+    });
+
+    //头工具栏事件
+    table.on('toolbar(test)', function(obj){
+        var checkStatus = table.checkStatus(obj.config.id);
+        switch(obj.event){
+            case 'getCheckData':
+                var data = checkStatus.data;
+                layer.alert(JSON.stringify(data));
+                break;
+            //自定义头工具栏右侧图标 - 提示
+            case 'LAYTABLE_TIPS':
+                layer.alert('这是工具栏右侧自定义的一个图标按钮');
+                break;
+        };
+    });
+
+    //监听行工具事件
+    table.on('tool(test)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'del'){
+            layer.confirm('真的删除该数据吗？', function(index){
+                $.ajax({
+                    method:"post",
+                    url:'./user/delUser',
+                    data:{
+                        id:data.id
+                    },
+                    success:function (resp) {
+                        if(resp=="success"){
+                            alert("删除成功")
+                        }
+                    }
+                })
+                layer.close(index);
+            });
+        } else if(obj.event === 'edit'){
+            $.ajax({
+                method:"post",
+                url:'./user/resetPwd',
+                data:{
+                    id:data.id
+                },
+                success:function (resp) {
+                    if(resp=="success"){
+                        alert("密码重置成功")
+                    }
+                }
+            })
+        }
+    });
+</script>
+</html>

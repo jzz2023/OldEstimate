@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>老年人各个等级信息</title>
+    <link rel="stylesheet" href="Layui/layui/css/layui.css">
+    <script src="Layui/layui/layui.js"></script>
+    <style>
+        .demoTable {
+            margin-top: 25px;
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        #egrade {
+            margin-left: 7px;
+            margin-right: 7px;
+        }
+        #test4{
+            float: left;
+            width: 150px;
+            font-size: 16px;
+            margin-top: 20px;
+            margin-left: 5px;
+        }
+        #adminDemo{
+            float: left;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="test4" class="demo-tree"></div>
+<div id="report" style="display: none">
+    <form class="layui-form layui-form-pane" lay-filter="report_form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">老人姓名：</label>
+            <div class="layui-input-block">
+                <input type="text" name="oldername" autocomplete="off" placeholder="请输入标题" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">登记编号</label>
+            <div class="layui-input-inline">
+                <input type="text" name="regno" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">日常生活</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="dailylife" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">精神状态</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="psychosis" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">沟通感知</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="sense" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">社会参与</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="involve" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">评估日期</label>
+                <div class="layui-input-block">
+                    <input type="text" name="date" id="date1" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">评估人</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="es_people" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+<div id="adminDemo">
+    <div class="demoTable">
+        老人姓名：
+        <div class="layui-inline">
+            <input class="layui-input" name="" id="oldername" autocomplete="off">
+        </div>
+        登记编号：
+        <div class="layui-inline">
+            <input class="layui-input" name="" id="regno" autocomplete="off">
+        </div>
+        评估次数:
+        <div class="layui-inline">
+            <input class="layui-input" name="" id="enumber" onkeyup="this.value=this.value.replace(/\D/g,'')"
+                   autocomplete="off">
+        </div>
+        <button id="search" class="layui-btn" data-type="reload">搜索</button>
+    </div>
+
+    <table class="layui-hide" id="egrade" lay-filter="user"></table>
+</div>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="assessment">进行评估</a>
+</script>
+
+</body>
+<script>
+    var $ = layui.$
+    var table = layui.table;
+    var tree = layui.tree;
+    var form = layui.form
+        ,layer = layui.layer
+        ,layedit = layui.layedit
+        ,laydate = layui.laydate;
+
+    laydate.render({
+        elem:'#date1'
+    })
+
+
+    $("#search").on('click', function () {
+        gradeTable.reload({
+            url: './grade/selectPageAndCondition',
+            where: {
+                oldername: $('#oldername').val(),
+                regno: $('#regno').val(),
+                enumber: $('#enumber').val()
+            },
+            page: {
+                curr: 1
+            }
+        })
+        return false;
+    })
+
+    gradeTable = table.render({
+        elem: '#egrade'
+        , url: 'http://localhost:8080/OldEstimate/grade/selectPage'
+        , method: "post"
+        , title: '老人数据表'
+        , cols: [[
+            {field: 'oldername', title: '老人姓名', fixed: 'left', unresize: true, sort: true}
+            , {field: 'regno', title: '登记编号'}
+            , {field: 'dailylife', title: '日常生活等级'}
+            , {field: 'psychosis', title: '精神状态等级'}
+            , {field: 'sense', title: '感知沟通等级'}
+            , {field: 'involve', title: '社会参与能力'}
+            , {field: 'enumber', title: '评估次数'}
+            , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 180}
+        ]]
+        , page: true
+        , limit: 5
+        , limits: [5, 10, 15, 20]
+        , parseData: function (res) {
+            return {
+                "code": 0,
+                "msg": "",
+                "count": res.totalCount,
+                data: res.rows
+            }
+        }
+        , data: [{
+            "oldername": "001",
+            "regno": "002",
+            "dailylife": "年龄大了",
+            "psychosis": "一二三",
+            "sense": "男",
+            "involve": "1965-10-09",
+            "enumber": "3"
+        }],
+    });
+
+    table.on('tool(user)', function (obj) {
+        var data = obj.data;
+        if (obj.event == 'assessment') {
+            if (data.enumber >= 4) {
+                layer.msg("评估次数达到上限，将为您生成评估报告")
+                setTimeout(function () {
+                    form.val("report_form",{
+                        "oldername":data.oldername,
+                        "regno":data.regno,
+                        "dailylife":data.dailylife,
+                        "psychosis":data.psychosis,
+                        "sense":data.sense,
+                        "involve":data.involve
+                    })
+                    layer.open({
+                        type:'1',
+                        title:'评估报告',
+                        content:$('#report'),
+                        shade:0.0
+                    })
+                },2000)
+                return;
+            }
+            window.location.href = 'dailyLife.html?regno=' + data.regno
+        }
+    });
+
+    //树形构件
+    $.ajax({
+        type: "get",
+        url: "./tree/getTree",
+        success: function (resp) {
+            tree.render({
+                elem: '#test4'
+                , data: resp
+                , accordion: true
+                ,onlyIconControl: true
+                ,click:function (obj) {
+                    // console.log(obj.data.title)
+                    var str = obj.data.title;
+                    // console.log(str.indexOf("0")!=-1)
+                    if(str.indexOf("0")!=-1){
+                        if(str.indexOf("生活")!=-1){
+                            getDaily("日常生活能力完好");
+                        }else if(str.indexOf("精神")!=-1){
+                            getPsychosis("精神状态能力完好")
+                        }else if(str.indexOf("沟通")!=-1){
+                            getSense("沟通感知能力完好")
+                        }else if(str.indexOf("社会")!=-1){
+                            getInvolve("社会参与能力完好")
+                        }
+                    }else if(str.indexOf("1")!=-1){
+                        if(str.indexOf("生活")!=-1){
+                            getDaily("日常生活轻度受损");
+                        }else if(str.indexOf("精神")!=-1){
+                            getPsychosis("精神状态轻度受损")
+                        }else if(str.indexOf("沟通")!=-1){
+                            getSense("沟通感知轻度受损")
+                        }else if(str.indexOf("社会")!=-1){
+                            getInvolve("社会参与轻度受损")
+                        }
+                    }else if(str.indexOf("2")!=-1){
+                        if(str.indexOf("生活")!=-1){
+                            getDaily("日常生活中度受损");
+                        }else if(str.indexOf("精神")!=-1){
+                            getPsychosis("精神状态中度受损")
+                        }else if(str.indexOf("沟通")!=-1){
+                            getSense("沟通感知中度受损")
+                        }else if(str.indexOf("社会")!=-1){
+                            getInvolve("社会参与中度受损")
+                        }
+                    }else if(str.indexOf("3")!=-1){
+                        if(str.indexOf("生活")!=-1){
+                            getDaily("日常生活重度受损");
+                        }else if(str.indexOf("精神")!=-1){
+                            getPsychosis("精神状态重度受损")
+                        }else if(str.indexOf("沟通")!=-1){
+                            getSense("沟通感知重度受损")
+                        }else if(str.indexOf("社会")!=-1){
+                            getInvolve("社会参与重度受损")
+                        }
+                    }
+                }
+            });
+        }
+    })
+
+//    表格重载
+    function getDaily(val) {
+        gradeTable.reload({
+            url: './tree/getTreePageAndCondition',
+            where: {
+                dailylife:val
+            },
+            page: {
+                curr: 1
+            }
+        })
+        return false;
+    }
+    function getPsychosis(val) {
+        gradeTable.reload({
+            url: './tree/getTreePageAndCondition',
+            where: {
+                psychosis:val
+            },
+            page: {
+                curr: 1
+            }
+        })
+        return false;
+    }
+    function getSense(val) {
+        gradeTable.reload({
+            url: './tree/getTreePageAndCondition',
+            where: {
+                sense:val
+            },
+            page: {
+                curr: 1
+            }
+        })
+        return false;
+    }
+    function getInvolve(val) {
+        gradeTable.reload({
+            url: './tree/getTreePageAndCondition',
+            where: {
+                involve:val
+            },
+            page: {
+                curr: 1
+            }
+        })
+        return false;
+    }
+
+</script>
+
+</html>

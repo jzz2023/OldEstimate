@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.estimate.mapper.TreeMapper">
+    <resultMap id="TreeMapper" type="olderTree"></resultMap>
+    <select id="getAll" resultMap="TreeMapper">
+        select * from tree
+    </select>
+    <select id="selectTreePageAndCondition" resultType="com.estimate.pojo.Egrade">
+        select * from egrade
+        <where>
+            <if test="egrade.dailylife != null and egrade.dailylife != ''">
+                and dailylife like #{egrade.dailylife}
+            </if>
+            <if test="egrade.psychosis != null and egrade.psychosis != ''">
+                and psychosis like #{egrade.psychosis}
+            </if>
+            <if test="egrade.sense != null and egrade.sense != ''">
+                and sense like #{egrade.sense}
+            </if>
+            <if test="egrade.involve != null and egrade.involve != ''">
+                and involve like #{egrade.involve}
+            </if>
+        </where>
+        limit #{begin},#{size}
+    </select>
+    <select id="selectTreeTotal" resultType="java.lang.Integer">
+        select count(*) from egrade
+        <where>
+            <if test="dailylife != null and dailylife != ''">
+                and dailylife like #{dailylife}
+            </if>
+            <if test="psychosis != null and psychosis != ''">
+                and psychosis like #{ psychosis}
+            </if>
+            <if test="sense != null and sense != ''">
+                and sense like #{sense}
+            </if>
+            <if test="involve != null and involve != ''">
+                and involve like #{involve}
+            </if>
+        </where>
+    </select>
+
+</mapper>

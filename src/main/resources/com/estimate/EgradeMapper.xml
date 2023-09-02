@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.estimate.mapper.EgradeMapper">
+    <resultMap id="EgradeMapper" type="egrade"></resultMap>
+
+    <update id="updateDailylife">
+        update egrade set dailylife = #{dailylife} where regno = #{regno}
+    </update>
+    <update id="updatePsychosis">
+        update egrade set psychosis = #{psychosis} where regno = #{regno}
+    </update>
+    <update id="updateSense">
+        update egrade set sense = #{sense} where regno = #{regno}
+    </update>
+    <update id="updateInvolve">
+        update egrade set involve = #{involve},enumber = #{enumber} where regno = #{regno}
+    </update>
+
+    <select id="getDailylife" resultMap="EgradeMapper">
+        select count(*) as value,dailylife as name from egrade group by dailylife
+    </select>
+
+    <select id="getPsychosis" resultMap="EgradeMapper">
+        select count(*) as value,psychosis as name from egrade group by psychosis
+    </select>
+    <select id="getSense" resultMap="EgradeMapper">
+        select count(*) as value,sense as name from egrade group by sense
+    </select>
+    <select id="getInvolve" resultMap="EgradeMapper">
+        select count(*) as value,involve as name from egrade group by involve
+    </select>
+    <select id="getColumnar" resultMap="EgradeMapper">
+        select oldername,enumber from egrade order by enumber
+    </select>
+    <select id="selectPageAndCondition" resultMap="EgradeMapper">
+        select * from egrade
+        <where>
+            <if test="egrade.oldername != null and egrade.oldername != ''">
+                and oldername like #{egrade.oldername}
+            </if>
+            <if test="egrade.regno != null and egrade.regno != ''">
+                and regno = #{egrade.regno}
+            </if>
+            <if test="egrade.enumber != null and egrade.enumber != ''">
+                and enumber = #{egrade.enumber}
+            </if>
+        </where>
+        limit #{begin},#{size}
+    </select>
+    <select id="selectTotalByCondition" resultType="java.lang.Integer">
+        select count(*) from egrade
+        <where>
+            <if test="oldername != null and oldername != ''">
+                and oldername like #{oldername}
+            </if>
+            <if test="regno != null and regno != ''">
+                and regno like #{regno}
+            </if>
+            <if test="enumber != null">
+                and enumber like #{enumber}
+            </if>
+        </where>
+    </select>
+    <select id="selectPage" resultMap="EgradeMapper">
+        select * from egrade limit #{begin},#{size}
+    </select>
+    <select id="totalCountByPage" resultType="java.lang.Integer">
+        select count(*) from egrade;
+    </select>
+    <select id="getByRegno" resultMap="EgradeMapper">
+        select * from egrade where regno = #{regno}
+    </select>
+    <select id="selectPageByDaily" resultMap="EgradeMapper">
+        select *
+        from egrade
+        <where>
+            <if test="dailylife != null and dailylife != ''">
+                and dailylife like #{dailylife}
+            </if>
+        </where>
+        limit #{begin},#{size}
+    </select>
+    <select id="selectTotalByDaily" resultType="java.lang.Integer">
+        select count(*)
+        from egrade
+        <where>
+            <if test="dailylife != null and dailylife != ''">
+                and dailylife like #{dailylife}
+            </if>
+        </where>
+    </select>
+    <select id="selectPageByPsychosis" resultMap="EgradeMapper">
+        select * from egrade
+        <where>
+            <if test="psychosis != null and psychosis != ''">
+                and psychosis like #{psychosis}
+            </if>
+        </where>
+        limit #{begin},#{size}
+    </select>
+    <select id="selectTotalByPsychosis" resultType="java.lang.Integer">
+        select count(*) from egrade
+        <where>
+            <if test="psychosis != null and psychosis != ''">
+                and psychosis like #{psychosis}
+            </if>
+        </where>
+    </select>
+    <select id="selectPageBySense" resultMap="EgradeMapper">
+        select * from egrade
+        <where>
+            <if test="sense != null and sense != ''">
+                and sense like #{sense}
+            </if>
+        </where>
+        limit #{begin},#{size}
+    </select>
+    <select id="selectTotalBySense" resultType="java.lang.Integer">
+        select count(*) from egrade
+        <where>
+            <if test="sense != null and sense != ''">
+                and sense like #{sense}
+            </if>
+        </where>
+    </select>
+    <select id="selectPageByInvolve" resultMap="EgradeMapper">
+        select *
+        from egrade
+        <where>
+            <if test="involve != null and involve != ''">
+                and involve like #{involve}
+            </if>
+        </where>
+        limit #{begin},#{size}
+    </select>
+    <select id="selectTotalByInvolve" resultType="java.lang.Integer">
+        select count(*)
+        from egrade
+        <where>
+            <if test="involve != null and involve != ''">
+                and involve like #{involve}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>
